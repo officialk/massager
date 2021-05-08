@@ -85,16 +85,19 @@ const ShowOptions = () => {
         {!isVibrating ? "Start Vibration" : "Stop Vibration"}
       </Button>
       <hr />
-      <ul>
-        <li>
-          Pressing the button without entering a pattern causes continous
-          vibration
-        </li>
-        <li>seperate the pattern with ,(commas)</li>
-        <li>intervals are to be in seconds</li>
-        <li>even intervals are vibrations</li>
-        <li>odd intervals are pauses</li>
-      </ul>
+      <Typography variant="body1">
+        <ul>
+          <li>
+            Pressing the button without entering a pattern causes continous
+            vibration
+          </li>
+          <li>seperate the pattern with ,(commas)</li>
+          <li>intervals are to be in seconds</li>
+          <li>even intervals are vibrations</li>
+          <li>odd intervals are pauses</li>
+          <li>you can loop the pattern by swithing loop pattern on</li>
+        </ul>
+      </Typography>
     </div>
   );
 };
