@@ -4,6 +4,8 @@ import {
   Button,
   CssBaseline,
   Grid,
+  Switch,
+  TextField,
   Toolbar,
   Typography,
 } from "@material-ui/core";
@@ -18,10 +20,32 @@ const DisplayError = () => {
   );
 };
 
-const ShowOptions = ({ isVibrating, setIsVibrating }) => {
+const ShowOptions = () => {
+  const [isVibrating, setIsVibrating] = useState(false);
+  const [pattern, setPattern] = useState("");
+  const [isLooping, setIsLooping] = useState(false);
   return (
     <div>
+      <TextField
+        value={pattern}
+        onChange={(e) => {
+          setPattern(e.target.value);
+        }}
+        variant="outlined"
+        label="Enter Vibration Pattern"
+        fullWidth
+      />
+      Loop Pattern
+      <Switch
+        color="primary"
+        checked={isLooping}
+        onChange={() => {
+          setIsLooping(!isLooping);
+        }}
+      />
+      <hr />
       <Button
+        fullWidth
         variant={isVibrating ? "outlined" : "contained"}
         color={isVibrating ? "secondary" : "primary"}
         onClick={() => {
@@ -31,20 +55,51 @@ const ShowOptions = ({ isVibrating, setIsVibrating }) => {
             navigator.vibrate(0);
           } else {
             setIsVibrating(true);
-            vibrateInterval = setInterval(() => {
-              navigator.vibrate(1000);
-            }, 1000);
+            let sum = 0;
+            let processedPattern = pattern.split(",").map((e) => {
+              let num = parseInt(e);
+              sum += num;
+
+              return num * 1000;
+            });
+            if (processedPattern.length > 1) {
+              navigator.vibrate(processedPattern);
+
+              if (isLooping) {
+                vibrateInterval = setInterval(() => {
+                  navigator.vibrate(processedPattern);
+                }, sum * 1000);
+              } else {
+                setTimeout(() => {
+                  setIsVibrating(false);
+                }, sum * 1000);
+              }
+            } else {
+              vibrateInterval = setInterval(() => {
+                navigator.vibrate(1000);
+              }, 1000);
+            }
           }
         }}
       >
-        {isVibrating ? "Start Vibration" : "Stop Vibration"}
+        {!isVibrating ? "Start Vibration" : "Stop Vibration"}
       </Button>
+      <hr />
+      <ul>
+        <li>
+          Pressing the button without entering a pattern causes continous
+          vibration
+        </li>
+        <li>seperate the pattern with ,(commas)</li>
+        <li>intervals are to be in seconds</li>
+        <li>even intervals are vibrations</li>
+        <li>odd intervals are pauses</li>
+      </ul>
     </div>
   );
 };
 
 function App() {
-  const [isVibrating, setIsVibrating] = useState(false);
   return (
     <CssBaseline>
       <AppBar position="sticky" color="primary">
@@ -56,14 +111,9 @@ function App() {
         <br />
       </div>
       <Grid container direction="row" justify="center" alignItems="center">
-        {navigator.vibrate === undefined ? (
-          <DisplayError />
-        ) : (
-          <ShowOptions
-            isVibrating={isVibrating}
-            setIsVibrating={setIsVibrating}
-          />
-        )}
+        <Grid item xs={10}>
+          {navigator.vibrate === undefined ? <DisplayError /> : <ShowOptions />}
+        </Grid>
       </Grid>
     </CssBaseline>
   );
